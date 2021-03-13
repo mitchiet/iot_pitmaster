@@ -24,7 +24,9 @@ https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
 - twxs.cmake
 - formulahendry.code-runner --helpful but not necessary
 
+## Running the program
 
+After pressing the flame icon for "Build, Flash, and Monitor" and making sure that the port is set to COM3, the terminal will say "Connecting......". At that point, hold down the boot button and only let go after stuff stops being printed to the console. Then, tap the enable button and the program will run.
 
 
 

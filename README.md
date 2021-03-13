@@ -10,22 +10,19 @@ https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
 
 ## Other things that are important to download
 
-Python 3.5+
-git
-GCC
-CMake --maybe unneccessary to download
-VS Code
+- Python 3.5+
+- git
+- GCC
+- CMake --maybe unneccessary to download
+- VS Code
 
 ## Necessary VS Code extensions
 
-ms-vscode.cpptools
-ms-vscode.cmake-tools
-espressif.esp-idf-extension
-twxs.cmake
-
-### Helpful
-
-formulahendry.code-runner
+- ms-vscode.cpptools
+- ms-vscode.cmake-tools
+- espressif.esp-idf-extension
+- twxs.cmake
+- formulahendry.code-runner --helpful but not necessary
 
 
 

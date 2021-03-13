@@ -8,6 +8,10 @@ https://www.youtube.com/watch?v=Lc6ausiKvQM
 
 https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
 
+## c_cpp_properties.json
+
+Change the compiler path to the xtensa-esp32-elf-gcc.exe compiler on your machine.
+
 ## Other things that are important to download
 
 - Python 3.5+

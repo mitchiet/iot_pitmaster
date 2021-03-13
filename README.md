@@ -1,4 +1,37 @@
-# Hello World Example
+# Important Notes from Mitchell
+
+## Setup ESP-IDF with VS Code
+
+https://www.youtube.com/watch?v=Lc6ausiKvQM
+
+## Driver needed to connect to ESP32 via micro usb
+
+https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers
+
+## Other things that are important to download
+
+Python 3.5+
+git
+GCC
+CMake --maybe unneccessary to download
+VS Code
+
+## Necessary VS Code extensions
+
+ms-vscode.cpptools
+ms-vscode.cmake-tools
+espressif.esp-idf-extension
+twxs.cmake
+
+### Helpful
+
+formulahendry.code-runner
+
+
+
+
+
+# Hello World (Pre-built) Example
 
 Starts a FreeRTOS task to print "Hello World".
 

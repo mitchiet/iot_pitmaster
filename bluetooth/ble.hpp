@@ -32,8 +32,10 @@ class ble {
         ble();
         ~ble();
 
+        static bool init();
+
         // used in advertizing config
-        static uint8_t adv_cfg_done;
+        static uint8_t m_adv_cfg_done;
 
         /**
          * Callback for GAP (Generic Access Profile)

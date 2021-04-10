@@ -9,22 +9,25 @@
  * @copyright Copyright (c) 2021
  * 
  */
-
-#include "ble_cfg.hpp"
-
 #include <iostream>
-
-#include "esp_log.h"
-#include <cstring>
-
+#include "ble.hpp"
+#include "ble_cfg.hpp"
 
 /// \todo Potentially add security measures such as passkey
 /// \todo Add the little blue info sign that other bluetooth devices have
 
-uint8_t ble::adv_cfg_done = 0;
+uint8_t ble::m_adv_cfg_done = 0;
 
+// Constructor
 ble::ble() {
+}
 
+// Deconstructor, potentially deinit the bluetooth
+ble::~ble() {
+}
+
+// Initialize
+bool ble::init() {
     esp_err_t ret;
 
     // Initialize NVS.
@@ -46,24 +49,24 @@ ble::ble() {
     ret = esp_bt_controller_init(&bt_cfg);
     if (ret) {
         std::cout << __func__ << "() ERROR: Init bt controller failed: " << esp_err_to_name(ret) << "\n";
-        return;
+        return false;
     }
     ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
     if (ret) {
         std::cout << __func__ << "() ERROR: Enable bt controller failed: " << esp_err_to_name(ret) << "\n";
-        return;
+        return false;
     }
 
     // Android bluetooth init and enable functions.
     ret = esp_bluedroid_init();
     if (ret) {
         std::cout << __func__ << "() ERROR: Init bluetooth failed: " << esp_err_to_name(ret) << "\n";
-        return;
+        return false;
     }
     ret = esp_bluedroid_enable();
     if (ret) {
         std::cout << __func__ << "() ERROR: Enable bluetooth failed: " << esp_err_to_name(ret) << "\n";
-        return;
+        return false;
     }
     
     // Callback for GATTC (Generic Attribute Profile - Client).
@@ -71,7 +74,7 @@ ble::ble() {
     ret = esp_ble_gattc_register_callback(gattc_event_handler);
     if (ret){
         std::cout << __func__ << "() ERROR: gGATTC register error, error code = " << ret << "\n";
-        return;
+        return false;
     }
 
     // Callback for GAP (Generic Access Profile).
@@ -79,27 +82,25 @@ ble::ble() {
     ret = esp_ble_gap_register_callback(gap_event_handler);
     if (ret){
         std::cout << __func__ << "() ERROR: GAP register error, error code = " << ret << "\n";
-        return;
+        return false;
     }
 
     // Registers a GATTC callback with app_id = 0.
     ret = esp_ble_gattc_app_register(0);
     if (ret){
         std::cout << __func__ << "() ERROR: GATTC app register error, error code = " << ret << "\n";
-        return;
+        return false;
     }
 
     // Sets the MTU (Max Trasmission Unit (in bytes)) to 500.
     ret = esp_ble_gatt_set_local_mtu(500);
     if (ret){
         std::cout << __func__ << "() ERROR: Set local  MTU failed, error code = " << ret << "\n";
-        return;
+        return false;
     }
     
-}
-
-// Deconstructor, potentially deinit the bluetooth
-ble::~ble() {
+    // Successfully initialized
+    return true;
 }
 
 
@@ -109,8 +110,8 @@ void ble::gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t
         // Event signalling the scan response data is set to complete.
         // Will start advertizing.
         case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT: {
-            ble::adv_cfg_done &= (~SCAN_RSP_CONFIG_FLAG);
-            if (ble::adv_cfg_done == 0){
+            ble::m_adv_cfg_done &= (~SCAN_RSP_CONFIG_FLAG);
+            if (ble::m_adv_cfg_done == 0){
                 std::cout << "Attempting to start advertizing.\n";
                 esp_ble_gap_start_advertising(&adv_params);
             }
@@ -120,8 +121,8 @@ void ble::gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t
         // Event signalling the advertizing data is set to complete.
         // Will start advertizing.
         case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:{
-            ble::adv_cfg_done &= (~ADV_CONFIG_FLAG);
-            if (ble::adv_cfg_done == 0){
+            ble::m_adv_cfg_done &= (~ADV_CONFIG_FLAG);
+            if (ble::m_adv_cfg_done == 0){
                 std::cout << "Attempting to start advertizing.\n";
                 esp_ble_gap_start_advertising(&adv_params);
             }
@@ -150,14 +151,14 @@ void ble::gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t
             if (ret) {
                 std::cout << "ERROR: config adv data failed, error code = " << ret << "\n";
             } else {
-                ble::adv_cfg_done |= ADV_CONFIG_FLAG;
+                ble::m_adv_cfg_done |= ADV_CONFIG_FLAG;
             }
 
             ret = esp_ble_gap_config_adv_data(&scan_rsp_config);
             if (ret) {
                 std::cout << "ERROR: config adv data failed, error code = " << ret << "\n";
             } else {
-                ble::adv_cfg_done |= SCAN_RSP_CONFIG_FLAG;
+                ble::m_adv_cfg_done |= SCAN_RSP_CONFIG_FLAG;
             }
 
             break;

@@ -30,12 +30,12 @@ class blowfan {
     public:
         inline blowfan(const int duty_cycle) {
             m_duty_cycle = duty_cycle;
-        };
+        }
         inline blowfan() {
             m_duty_cycle = 0;
-        };
+        }
         inline ~blowfan(){
-        };
+        }
 
         inline void set_duty_cycle(const int duty_cycle) {
             m_duty_cycle = duty_cycle;

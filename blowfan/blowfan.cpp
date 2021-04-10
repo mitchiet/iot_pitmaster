@@ -22,25 +22,22 @@
 int blowfan::m_duty_cycle = 0;
 
 // blowfan thread function
-void* blowfan::blowfan_run(void* duty_cycle) {
+void* blowfan::blowfan_run(void* p) {
     // blowfan GPIO setup
     gpio_reset_pin(GPIO_FAN_PWM);
     gpio_set_direction(GPIO_FAN_PWM, GPIO_MODE_OUTPUT);
     gpio_set_level(GPIO_FAN_PWM, 0);
 
-    // cast the duty cycle input to an int pointer
-    int* on_percent_ptr = reinterpret_cast<int*>(duty_cycle);
-
     while (1) {
-        if (*on_percent_ptr > 0) {
+        if (m_duty_cycle > 0) {
             // on part of cycle
             gpio_set_level(GPIO_FAN_PWM, 1);
-            vTaskDelay(*on_percent_ptr / portTICK_PERIOD_MS);
+            vTaskDelay(m_duty_cycle / portTICK_PERIOD_MS);
 
             // off part of cycle
-            if (*on_percent_ptr < 100) {
+            if (m_duty_cycle < 100) {
                 gpio_set_level(GPIO_FAN_PWM, 0);
-                vTaskDelay((100 - *on_percent_ptr) / portTICK_PERIOD_MS);
+                vTaskDelay((100 - m_duty_cycle) / portTICK_PERIOD_MS);
             }
         }
     }
@@ -49,7 +46,7 @@ void* blowfan::blowfan_run(void* duty_cycle) {
 // starts the thread that controls the blowfan voltage
 bool blowfan::launch_fan_thread() {
     pthread_t blowfan_thread;
-    int ret = pthread_create(&blowfan_thread, NULL, blowfan_run, (void*) &blowfan::m_duty_cycle);
+    int ret = pthread_create(&blowfan_thread, NULL, blowfan_run, NULL);
     if (ret) {
         std::cout << "Error: The blowfan thread did not start.\n";
         return false;

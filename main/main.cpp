@@ -21,16 +21,7 @@
 
 #include "ble.hpp"
 #include "blowfan.hpp"
-
-// GPIO for stepper driver
-const gpio_num_t GPIO_NOT_EN = GPIO_NUM_19;
-const gpio_num_t GPIO_MS1 = GPIO_NUM_18;
-const gpio_num_t GPIO_MS2 = GPIO_NUM_5;
-const gpio_num_t GPIO_MS3 = GPIO_NUM_17;
-const gpio_num_t GPIO_NOT_RST = GPIO_NUM_16;
-const gpio_num_t GPIO_NOT_SLP = GPIO_NUM_4;
-const gpio_num_t GPIO_STEP = GPIO_NUM_0;
-const gpio_num_t GPIO_DIR = GPIO_NUM_2;
+#include "hopper_motor.hpp"
 
 extern "C" void app_main(void)
 {
@@ -43,62 +34,14 @@ extern "C" void app_main(void)
     blowfan bf(100);
     bf.launch_fan_thread();
 
-    // demo that new fan speed can be set after creating the fan thread
+    hopper_motor hm;
+    hm.launch_hopper_motor_thread();
+
     vTaskDelay(5000 / portTICK_PERIOD_MS);
+    // demo direction change
+    hm.set_dir(1);
+    // demo that new fan speed can be set after creating the fan thread
     bf.set_duty_cycle(20);
-
-
-    /// \todo move all the following to its own file and thread
-    // ~enable
-    gpio_reset_pin(GPIO_NOT_EN);
-    gpio_set_direction(GPIO_NOT_EN, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_NOT_EN, 0);
-
-    // ms1
-    gpio_reset_pin(GPIO_MS1);
-    gpio_set_direction(GPIO_MS1, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_MS1, 0);
-
-    // ms2
-    gpio_reset_pin(GPIO_MS2);
-    gpio_set_direction(GPIO_MS2, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_MS2, 0);
-
-    // ms3
-    gpio_reset_pin(GPIO_MS3);
-    gpio_set_direction(GPIO_MS3, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_MS3, 0);
-
-    // ~reset
-    gpio_reset_pin(GPIO_NOT_RST);
-    gpio_set_direction(GPIO_NOT_RST, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_NOT_RST, 1);
-
-    // ~sleep
-    gpio_reset_pin(GPIO_NOT_SLP);
-    gpio_set_direction(GPIO_NOT_SLP, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_NOT_SLP, 1);
-
-    // step
-    gpio_reset_pin(GPIO_STEP);
-    gpio_set_direction(GPIO_STEP, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_STEP, 0);
-
-    // dir
-    gpio_reset_pin(GPIO_DIR);
-    gpio_set_direction(GPIO_DIR, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_DIR, 0);
-
-
-    while (1) {
-        gpio_set_level(GPIO_STEP, 1);
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-
-        gpio_set_level(GPIO_STEP, 0);
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-    }
-
-    
 
     /* Print chip information */
     /**

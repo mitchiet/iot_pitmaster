@@ -36,17 +36,13 @@ extern "C" void app_main(void)
     ble ble_conn;
     ble_conn.init();
 
-    blowfan bf(100);
+    blowfan bf(0);
     bf.launch_fan_thread();
 
     hopper_motor hm;
     hm.launch_hopper_motor_thread();
 
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-    // demo direction change
-    //hm.set_dir(1);
-    // demo that new fan speed can be set after creating the fan thread
-    //bf.set_duty_cycle(20);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); // wait a second
 
     /* Necessary magic to make the console function properly*/
     /* Not needed in final product */

@@ -29,16 +29,16 @@ void* blowfan::blowfan_run(void* p) {
     gpio_set_level(GPIO_FAN_PWM, 0);
 
     while (1) {
+        // on part of cycle
         if (m_duty_cycle > 0) {
-            // on part of cycle
             gpio_set_level(GPIO_FAN_PWM, 1);
             vTaskDelay(m_duty_cycle / portTICK_PERIOD_MS);
+        }
 
-            // off part of cycle
-            if (m_duty_cycle < 100) {
-                gpio_set_level(GPIO_FAN_PWM, 0);
-                vTaskDelay((100 - m_duty_cycle) / portTICK_PERIOD_MS);
-            }
+        // off part of cycle
+        if (m_duty_cycle < 100) {
+            gpio_set_level(GPIO_FAN_PWM, 0);
+            vTaskDelay((100 - m_duty_cycle) / portTICK_PERIOD_MS);
         }
     }
 }

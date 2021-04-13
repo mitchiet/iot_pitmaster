@@ -20,7 +20,7 @@
 
 // DEFAULTS
 // ~enable signal
-int hopper_motor::not_en = 0;
+int hopper_motor::not_en = 1;
 // ms1 signal
 int hopper_motor::ms1 = 0;
 // ms2 signal
@@ -85,6 +85,10 @@ void* hopper_motor::stepper_run(void* p) {
 
             hopper_motor::set_step(0);
             vTaskDelay(1 / portTICK_PERIOD_MS); // running at 1000 HZ, set pulse for 1 ms
+        }
+        else {
+            hopper_motor::set_step(0);
+            vTaskDelay(1 / portTICK_PERIOD_MS);
         }
     }
 }

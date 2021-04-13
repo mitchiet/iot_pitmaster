@@ -13,6 +13,7 @@
 #ifndef __BLOWFAN_HPP__
 #define __BLOWFAN_HPP__
 
+#include <iostream>
 #include "driver/gpio.h"
 
 // GPIO for blowfan
@@ -39,6 +40,7 @@ class blowfan {
 
         inline void set_duty_cycle(const int duty_cycle) {
             m_duty_cycle = duty_cycle;
+            std::cout << "Set Blowfan duty cycle to " << duty_cycle << "%\n";
         }
 
         // thread launcher

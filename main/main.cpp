@@ -10,6 +10,8 @@
  */
 #include <stdio.h>
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <pthread.h>
 
 #include "sdkconfig.h"
@@ -18,6 +20,9 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 #include "driver/gpio.h"
+#include "driver/uart.h"
+#include "esp_vfs_dev.h"
+#include "linenoise/linenoise.h"
 
 #include "ble.hpp"
 #include "blowfan.hpp"
@@ -39,9 +44,118 @@ extern "C" void app_main(void)
 
     vTaskDelay(5000 / portTICK_PERIOD_MS);
     // demo direction change
-    hm.set_dir(1);
+    //hm.set_dir(1);
     // demo that new fan speed can be set after creating the fan thread
-    bf.set_duty_cycle(20);
+    //bf.set_duty_cycle(20);
+
+    /* Necessary magic to make the console function properly*/
+    /* Not needed in final product */
+    ESP_ERROR_CHECK( uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM,   // installs uart driver
+            256, 0, 0, NULL, 0) );
+    esp_vfs_dev_uart_use_driver(CONFIG_ESP_CONSOLE_UART_NUM);           // uses uart driver
+    setvbuf(stdin, NULL, _IONBF, 0);    // sets stdin to not buffer
+    setvbuf(stdout, NULL, _IONBF, 0);   // sets stdout to not buffer
+    esp_vfs_dev_uart_set_rx_line_endings(ESP_LINE_ENDINGS_CR);      // carriage return when ENTER
+    esp_vfs_dev_uart_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);    // newline behavior
+    
+    
+
+    std::cout << "Beginning Command Loop.\n"; 
+    while (1) {
+        std::string signal_name = "";
+        std::string level_str;
+        int level = -1;
+
+        // roundabout cin
+        char* line = linenoise("\nEnter Command: "); // will work with MobaXTerm
+        std::istringstream s(line);
+        linenoiseFree(line); // free the memory
+        s >> signal_name >> level_str;
+        try{level = std::stoi(level_str);}
+        catch(...) {
+            level = -1;
+            std::cout << "Error: Second argument must be numerical.\n";
+        }
+
+        /* BLOWFAN COMMANDS */
+        if (signal_name == "duty_cycle") {
+            if (level >= 0 || level <= 100) {
+                bf.set_duty_cycle(level);
+            }
+            else {
+                std::cout << "Error: Blowfan duty cycle must be between 0 and 100.\n";
+            }
+        }
+
+        /* STEPPER MOTOR COMMANDS */
+        else if (signal_name == "not_en") {
+            if (level == 1 || level == 0) {
+                hm.set_not_en(level);
+            }
+            else {
+                std::cout << "Error: ~Enable direction can only be set to 1 or 0.\n";
+            }
+        }
+
+        else if (signal_name == "ms1") {
+            if (level == 1 || level == 0) {
+                hm.set_ms1(level);
+            }
+            else {
+                std::cout << "Error: MS1 can only be set to 1 or 0.\n";
+            }
+        }
+
+        else if (signal_name == "ms2") {
+            if (level == 1 || level == 0) {
+                hm.set_ms2(level);
+            }
+            else {
+                std::cout << "Error: MS2 can only be set to 1 or 0.\n";
+            }
+        }
+
+        else if (signal_name == "ms3") {
+            if (level == 1 || level == 0) {
+                hm.set_ms3(level);
+            }
+            else {
+                std::cout << "Error: MS3 can only be set to 1 or 0.\n";
+            }
+        }
+
+        else if (signal_name == "not_rst") {
+            if (level == 1 || level == 0) {
+                hm.set_not_rst(level);
+            }
+            else {
+                std::cout << "Error: ~Reset can only be set to 1 or 0.\n";
+            }
+        }
+
+        else if (signal_name == "not_slp") {
+            if (level == 1 || level == 0) {
+                hm.set_not_slp(level);
+            }
+            else {
+                std::cout << "Error: ~Sleep can only be set to 1 or 0.\n";
+            }
+        }
+
+        else if (signal_name == "dir") {
+            if (level == 1 || level == 0) {
+                hm.set_dir(level); // 1 is clockwise, 0 is counterclockwise
+            }
+            else {
+                std::cout << "Error: Stepper direction can only be set to 1 or 0.\n";
+            }
+        }
+
+        else {
+            std::cout << "Error: Not a recognized command.\n";
+        }
+    }
+    
 
     /* Print chip information */
     /**

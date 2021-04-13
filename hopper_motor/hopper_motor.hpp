@@ -13,6 +13,7 @@
 #ifndef __HOPPER_MOTOR_HPP__
 #define __HOPPER_MOTOR_HPP__
 
+#include <iostream>
 #include "driver/gpio.h"
 
 // GPIO for stepper driver
@@ -64,48 +65,60 @@ class hopper_motor {
         inline static void set_not_en(int level) {
             not_en = level;
             gpio_set_level(GPIO_NOT_EN, not_en);
+            std::cout << "Set ~Enable signal to " << level << "\n";
         }
 
         // sets ms1
         inline static void set_ms1(int level) {
             ms1 = level;
             gpio_set_level(GPIO_MS1, ms1);
+            std::cout << "Set MS1 signal to " << level << "\n";
         }
 
         // sets ms2
         inline static void set_ms2(int level) {
             ms2 = level;
             gpio_set_level(GPIO_MS2, ms2);
+            std::cout << "Set MS2 signal to " << level << "\n";
         }
 
         // sets ms3
         inline static void set_ms3(int level) {
             ms3 = level;
             gpio_set_level(GPIO_MS3, ms3);
+            std::cout << "Set MS3 signal to " << level << "\n";
         }
 
         // sets ~reset
         inline static void set_not_rst(int level) {
             not_rst = level;
             gpio_set_level(GPIO_NOT_RST, not_rst);
+            std::cout << "Set ~Reset signal to " << level << "\n";
         }
 
         // sets ~sleep
         inline static void set_not_slp(int level) {
             not_slp = level;
             gpio_set_level(GPIO_NOT_SLP, not_slp);
+            std::cout << "Set ~Sleep to " << level << "\n";
         }
 
         // sets step (pulse)
         inline static void set_step(const int level) {
             step = level;
             gpio_set_level(GPIO_STEP, step);
+            //std::cout << "Set step to " << level << "\n"; // called too often
         }
 
         // sets direction (1 is clockwise, 0 is counterclockwise)
         inline static void set_dir(int level) {
             dir = level;
             gpio_set_level(GPIO_DIR, dir);
+            std::cout << "Set Direction signal to " << level << "\n";
+            if (level == 1)
+                std::cout << "Hopper motor set to Clockwise\n";
+            else if(level == 0)
+                std::cout << "Hopper motor set to Counterclockwise\n";
         }
 
 };

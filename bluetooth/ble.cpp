@@ -10,6 +10,7 @@
  * 
  */
 #include <iostream>
+#include <cstring>
 #include "ble.hpp"
 #include "ble_cfg.hpp"
 
@@ -193,6 +194,14 @@ void ble::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t 
         // Made a connection with a device.
         case ESP_GATTC_CONNECT_EVT: {
             std::cout << "Connected to device.\n";
+            gl_profile_tab[0].conn_id = param->connect.conn_id; // profile 0
+            std::memcpy(gl_profile_tab[0].remote_bda, param->connect.remote_bda, sizeof(esp_bd_addr_t)); // profile 0
+            int ret = esp_ble_gattc_send_mtu_req(gattc_if, param->connect.conn_id);
+            if (ret)
+                std::cout << "Error: MTU config error\n";
+            
+            // open the connection
+            esp_ble_gattc_open(gl_profile_tab[0].gattc_if, gl_profile_tab[0].remote_bda, BLE_ADDR_TYPE_RANDOM, true); // profile 0
             break;
         }
 
@@ -201,6 +210,11 @@ void ble::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t 
             std::cout << "Device disconnected.\n";
             std::cout << "Attempting to start advertizing again.\n";
             esp_ble_gap_start_advertising(&adv_params);
+            break;
+        }
+
+        case ESP_GATTC_OPEN_EVT: {
+            std::cout << "Connection opened.\n";
             break;
         }
         

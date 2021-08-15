@@ -24,7 +24,7 @@
 
 #include "ble.hpp"
 #include "pwm.hpp"
-#include "hopper_motor.hpp"
+#include "a4988_driver.hpp"
 
 constexpr gpio_num_t gpio_blowfan{GPIO_NUM_21};
 
@@ -40,8 +40,8 @@ extern "C" void app_main(void)
     std::thread blowfan_thread = blowfan.pwm_run_thread();
     blowfan_thread.detach();
 
-    hopper_motor hm;
-    hm.launch_hopper_motor_thread();
+    a4988_driver hopper_controller;
+    hopper_controller.launch_a4988_driver_thread();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS); // wait a second
 
@@ -87,7 +87,7 @@ extern "C" void app_main(void)
         /* STEPPER MOTOR COMMANDS */
         else if (signal_name == "not_en") {
             if (level == 1 || level == 0) {
-                hm.set_not_en(level);
+                hopper_controller.set_not_en(level);
             }
             else {
                 std::cout << "Error: ~Enable direction can only be set to 1 or 0.\n";
@@ -96,7 +96,7 @@ extern "C" void app_main(void)
 
         else if (signal_name == "ms1") {
             if (level == 1 || level == 0) {
-                hm.set_ms1(level);
+                hopper_controller.set_ms1(level);
             }
             else {
                 std::cout << "Error: MS1 can only be set to 1 or 0.\n";
@@ -105,7 +105,7 @@ extern "C" void app_main(void)
 
         else if (signal_name == "ms2") {
             if (level == 1 || level == 0) {
-                hm.set_ms2(level);
+                hopper_controller.set_ms2(level);
             }
             else {
                 std::cout << "Error: MS2 can only be set to 1 or 0.\n";
@@ -114,7 +114,7 @@ extern "C" void app_main(void)
 
         else if (signal_name == "ms3") {
             if (level == 1 || level == 0) {
-                hm.set_ms3(level);
+                hopper_controller.set_ms3(level);
             }
             else {
                 std::cout << "Error: MS3 can only be set to 1 or 0.\n";
@@ -123,7 +123,7 @@ extern "C" void app_main(void)
 
         else if (signal_name == "not_rst") {
             if (level == 1 || level == 0) {
-                hm.set_not_rst(level);
+                hopper_controller.set_not_rst(level);
             }
             else {
                 std::cout << "Error: ~Reset can only be set to 1 or 0.\n";
@@ -132,7 +132,7 @@ extern "C" void app_main(void)
 
         else if (signal_name == "not_slp") {
             if (level == 1 || level == 0) {
-                hm.set_not_slp(level);
+                hopper_controller.set_not_slp(level);
             }
             else {
                 std::cout << "Error: ~Sleep can only be set to 1 or 0.\n";
@@ -141,7 +141,7 @@ extern "C" void app_main(void)
 
         else if (signal_name == "dir") {
             if (level == 1 || level == 0) {
-                hm.set_dir(level); // 1 is clockwise, 0 is counterclockwise
+                hopper_controller.set_dir(level); // 1 is clockwise, 0 is counterclockwise
             }
             else {
                 std::cout << "Error: Stepper direction can only be set to 1 or 0.\n";

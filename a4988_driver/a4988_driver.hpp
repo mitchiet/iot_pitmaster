@@ -1,19 +1,16 @@
 /**
- * @file hopper_motor.hpp
- * @author Mitchell Taylor
- *                          
- * @brief 
- * @version 0.1
- * @date 2021-04-10
+ * @file a4988_driver.hpp                  
+ * @brief Stepper Motor Driver
  * 
  * @copyright Copyright (c) 2021
  * 
  */
 
-#ifndef __HOPPER_MOTOR_HPP__
-#define __HOPPER_MOTOR_HPP__
+#ifndef __A4988_DRIVER_HPP__
+#define __A4988_DRIVER_HPP__
 
 #include <iostream>
+
 #include "driver/gpio.h"
 
 // GPIO for stepper driver
@@ -31,7 +28,7 @@ constexpr gpio_num_t GPIO_DIR = GPIO_NUM_15;
 /// \todo change name to stepper motor
 /// \todo this pointers
 
-class hopper_motor {
+class a4988_driver {
 
     private:
 
@@ -57,14 +54,11 @@ class hopper_motor {
 
 
     public:
-        inline hopper_motor() {
-        }
-
-        inline ~hopper_motor(){
+        inline a4988_driver() {
         }
 
         // thread launcher
-        static bool launch_hopper_motor_thread();
+        static bool launch_a4988_driver_thread();
 
         // sets ~enable
         inline static void set_not_en(int level) {
@@ -121,11 +115,11 @@ class hopper_motor {
             gpio_set_level(GPIO_DIR, dir);
             std::cout << "Set Direction signal to " << level << "\n";
             if (level == 1)
-                std::cout << "Hopper motor set to Clockwise\n";
+                std::cout << "Direction set to Clockwise\n";
             else if(level == 0)
-                std::cout << "Hopper motor set to Counterclockwise\n";
+                std::cout << "Direction set to Counterclockwise\n";
         }
 
 };
 
-#endif /* __HOPPER_MOTOR_HPP__ */
+#endif /* __A4988_DRIVER_HPP__ */

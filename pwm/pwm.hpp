@@ -1,10 +1,6 @@
 /**
  * @file pwm.hpp
- * @author Mitchell Taylor
- *                          
- * @brief 
- * @version 0.1
- * @date 2021-04-09
+ * @brief Pulse Width Modulation
  * 
  * @copyright Copyright (c) 2021
  * 
@@ -14,35 +10,34 @@
 #define __PWM_HPP__
 
 #include <iostream>
-#include "driver/gpio.h"
+#include <thread>
 
-/// \todo get rid of static
+#include "driver/gpio.h"
 
 class pwm {
 
     private:
         // the duty cycle of the pwm (0-100)%
-        static int m_duty_cycle;
+        int m_duty_cycle;
         // the gpio pin being used
-        static gpio_num_t m_gpio;
-
-        // thread that runs
-        static void* pwm_run(void* duty_cycle);
+        gpio_num_t m_gpio;
 
     public:
         inline pwm(const gpio_num_t gpio, const int duty_cycle) {
-            m_gpio = gpio;
-            m_duty_cycle = duty_cycle;
+            this->m_gpio = gpio;
+            this->m_duty_cycle = duty_cycle;
         }
 
         inline void set_duty_cycle(const int duty_cycle) {
-            m_duty_cycle = duty_cycle;
+            this->m_duty_cycle = duty_cycle;
             std::cout << "Set pwm duty cycle to " << duty_cycle << "%\n";
         }
 
-        // thread launcher
-        static bool launch_pwm_thread();
+        // main pwm logic function
+        void pwm_run();
 
+        // thread function
+        std::thread pwm_run_thread();
 };
 
 #endif /* __PWM_HPP__ */

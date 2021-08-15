@@ -1,9 +1,6 @@
 /**
  * @file main.cpp
- * @author Mitchell Taylor
- * @brief 
- * @version 0.1
- * @date 2021-03-17
+ * @brief Main Function
  * 
  * @copyright Copyright (c) 2021
  * 
@@ -13,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <pthread.h>
+#include <thread>
 
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
@@ -39,7 +37,8 @@ extern "C" void app_main(void)
     ble_conn.init();
 
     pwm blowfan(gpio_blowfan, 0);
-    blowfan.launch_pwm_thread();
+    std::thread blowfan_thread = blowfan.pwm_run_thread();
+    blowfan_thread.detach();
 
     hopper_motor hm;
     hm.launch_hopper_motor_thread();

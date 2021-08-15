@@ -17,14 +17,19 @@
 #include "driver/gpio.h"
 
 // GPIO for stepper driver
-const gpio_num_t GPIO_NOT_EN = GPIO_NUM_19;
-const gpio_num_t GPIO_MS1 = GPIO_NUM_18;
-const gpio_num_t GPIO_MS2 = GPIO_NUM_5;
-const gpio_num_t GPIO_MS3 = GPIO_NUM_17;
-const gpio_num_t GPIO_NOT_RST = GPIO_NUM_16;
-const gpio_num_t GPIO_NOT_SLP = GPIO_NUM_4;
-const gpio_num_t GPIO_STEP = GPIO_NUM_0;
-const gpio_num_t GPIO_DIR = GPIO_NUM_2;
+constexpr gpio_num_t GPIO_NOT_EN = GPIO_NUM_18;
+constexpr gpio_num_t GPIO_MS1 = GPIO_NUM_5;
+constexpr gpio_num_t GPIO_MS2 = GPIO_NUM_17;
+constexpr gpio_num_t GPIO_MS3 = GPIO_NUM_16;
+constexpr gpio_num_t GPIO_NOT_RST = GPIO_NUM_4;
+constexpr gpio_num_t GPIO_NOT_SLP = GPIO_NUM_0;
+constexpr gpio_num_t GPIO_STEP = GPIO_NUM_2;
+constexpr gpio_num_t GPIO_DIR = GPIO_NUM_15;
+
+/// \todo get rid of static
+/// \todo make GPIO members
+/// \todo change name to stepper motor
+/// \todo this pointers
 
 class hopper_motor {
 

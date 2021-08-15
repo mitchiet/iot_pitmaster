@@ -25,8 +25,10 @@
 #include "linenoise/linenoise.h"
 
 #include "ble.hpp"
-#include "blowfan.hpp"
+#include "pwm.hpp"
 #include "hopper_motor.hpp"
+
+constexpr gpio_num_t gpio_blowfan{GPIO_NUM_21};
 
 extern "C" void app_main(void)
 {
@@ -36,8 +38,8 @@ extern "C" void app_main(void)
     ble ble_conn;
     ble_conn.init();
 
-    blowfan bf(0);
-    bf.launch_fan_thread();
+    pwm blowfan(gpio_blowfan, 0);
+    blowfan.launch_pwm_thread();
 
     hopper_motor hm;
     hm.launch_hopper_motor_thread();
@@ -76,7 +78,7 @@ extern "C" void app_main(void)
         /* BLOWFAN COMMANDS */
         if (signal_name == "duty_cycle") {
             if (level >= 0 || level <= 100) {
-                bf.set_duty_cycle(level);
+                blowfan.set_duty_cycle(level);
             }
             else {
                 std::cout << "Error: Blowfan duty cycle must be between 0 and 100.\n";

@@ -8,95 +8,73 @@
 #include "a4988_driver.hpp"
 
 #include <iostream>
-#include <pthread.h>
+#include <thread>
 
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-// DEFAULTS
-// ~enable signal
-int a4988_driver::not_en = 1;
-// ms1 signal
-int a4988_driver::ms1 = 0;
-// ms2 signal
-int a4988_driver::ms2 = 0;
-// ms3 signal
-int a4988_driver::ms3 = 0;
-// ~reset signal
-int a4988_driver::not_rst = 1;
-// ~sleep signal
-int a4988_driver::not_slp = 1;
-// step signal, on and off pulses
-int a4988_driver::step = 0;
-// direction signal
-int a4988_driver::dir = 0;
+// a4988 run function
+void a4988_driver::a4988_run() {
 
-// hopper motor thread function
-void* a4988_driver::stepper_run(void* p) {
     // ~enable
-    gpio_reset_pin(GPIO_NOT_EN);
-    gpio_set_direction(GPIO_NOT_EN, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_NOT_EN, a4988_driver::not_en);
+    gpio_reset_pin(this->m_gpio_not_en);
+    gpio_set_direction(this->m_gpio_not_en, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_not_en, 1); // default
 
     // ms1
-    gpio_reset_pin(GPIO_MS1);
-    gpio_set_direction(GPIO_MS1, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_MS1, a4988_driver::ms1);
+    gpio_reset_pin(this->m_gpio_ms1);
+    gpio_set_direction(this->m_gpio_ms1, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_ms1, 0); // default
 
     // ms2
-    gpio_reset_pin(GPIO_MS2);
-    gpio_set_direction(GPIO_MS2, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_MS2, a4988_driver::ms2);
+    gpio_reset_pin(this->m_gpio_ms2);
+    gpio_set_direction(this->m_gpio_ms2, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_ms2, 0); // default
 
     // ms3
-    gpio_reset_pin(GPIO_MS3);
-    gpio_set_direction(GPIO_MS3, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_MS3, a4988_driver::ms3);
+    gpio_reset_pin(this->m_gpio_ms3);
+    gpio_set_direction(this->m_gpio_ms3, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_ms3, 0); // default
 
     // ~reset
-    gpio_reset_pin(GPIO_NOT_RST);
-    gpio_set_direction(GPIO_NOT_RST, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_NOT_RST, a4988_driver::not_rst);
+    gpio_reset_pin(this->m_gpio_not_rst);
+    gpio_set_direction(this->m_gpio_not_rst, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_not_rst, 1); // default
 
     // ~sleep
-    gpio_reset_pin(GPIO_NOT_SLP);
-    gpio_set_direction(GPIO_NOT_SLP, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_NOT_SLP, a4988_driver::not_slp);
+    gpio_reset_pin(this->m_gpio_not_slp);
+    gpio_set_direction(this->m_gpio_not_slp, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_not_slp, 1); // default
 
     // step
-    gpio_reset_pin(GPIO_STEP);
-    gpio_set_direction(GPIO_STEP, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_STEP, a4988_driver::step);
+    gpio_reset_pin(this->m_gpio_step);
+    gpio_set_direction(this->m_gpio_step, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_step, 0); // default
 
     // dir
-    gpio_reset_pin(GPIO_DIR);
-    gpio_set_direction(GPIO_DIR, GPIO_MODE_OUTPUT);
-    gpio_set_level(GPIO_DIR, a4988_driver::dir);
+    gpio_reset_pin(this->m_gpio_dir);
+    gpio_set_direction(this->m_gpio_dir, GPIO_MODE_OUTPUT);
+    gpio_set_level(this->m_gpio_dir, 0); // default
 
     while (1) {
-        if (!a4988_driver::not_en) {
-            a4988_driver::set_step(1);
+        if (this->m_enabled) {
+            this->set_step(1);
             vTaskDelay(1 / portTICK_PERIOD_MS); // running at 1000 HZ, set pulse for 1 ms
 
-            a4988_driver::set_step(0);
+            this->set_step(0);
             vTaskDelay(1 / portTICK_PERIOD_MS); // running at 1000 HZ, set pulse for 1 ms
         }
         else {
-            a4988_driver::set_step(0);
+            this->set_step(0);
             vTaskDelay(1 / portTICK_PERIOD_MS);
         }
     }
 }
 
-// starts the thread that controls the stepper motor
-bool a4988_driver::launch_a4988_driver_thread() {
-    pthread_t stepper_thread;
-    int ret = pthread_create(&stepper_thread, NULL, stepper_run, NULL);
-    if (ret) {
-        std::cout << "Error: The hopper motor thread did not start.\n";
-        return false;
-    }
-
-    return true;
+// a4988 thread function
+std::thread a4988_driver::a4988_run_thread() {
+    return std::thread( [this] {
+        this->a4988_run();
+    });
 }

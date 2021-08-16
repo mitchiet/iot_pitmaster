@@ -26,7 +26,18 @@
 #include "pwm.hpp"
 #include "a4988_driver.hpp"
 
+// blowfan pwm gpio
 constexpr gpio_num_t gpio_blowfan{GPIO_NUM_21};
+
+// hopper motor driver gpio
+constexpr gpio_num_t gpio_hopper_not_en = GPIO_NUM_18;
+constexpr gpio_num_t gpio_hopper_ms1 = GPIO_NUM_5;
+constexpr gpio_num_t gpio_hopper_ms2 = GPIO_NUM_17;
+constexpr gpio_num_t gpio_hopper_ms3 = GPIO_NUM_16;
+constexpr gpio_num_t gpio_hopper_not_rst = GPIO_NUM_4;
+constexpr gpio_num_t gpio_hopper_not_slp = GPIO_NUM_0;
+constexpr gpio_num_t gpio_hopper_step = GPIO_NUM_2;
+constexpr gpio_num_t gpio_hopper_dir = GPIO_NUM_15;
 
 extern "C" void app_main(void)
 {
@@ -40,10 +51,15 @@ extern "C" void app_main(void)
     std::thread blowfan_thread = blowfan.pwm_run_thread();
     blowfan_thread.detach();
 
-    a4988_driver hopper_controller;
-    hopper_controller.launch_a4988_driver_thread();
+    a4988_driver hopper_controller(gpio_hopper_not_en, gpio_hopper_ms1,
+                                   gpio_hopper_ms2, gpio_hopper_ms3,
+                                   gpio_hopper_not_rst, gpio_hopper_not_slp,
+                                   gpio_hopper_step, gpio_hopper_dir);
+    std::thread hopper_thread = hopper_controller.a4988_run_thread();
+    hopper_thread.detach();
 
     vTaskDelay(1000 / portTICK_PERIOD_MS); // wait a second
+
 
     /* Necessary magic to make the console function properly*/
     /* Not needed in final product */
@@ -54,8 +70,7 @@ extern "C" void app_main(void)
     setvbuf(stdout, NULL, _IONBF, 0);   // sets stdout to not buffer
     esp_vfs_dev_uart_set_rx_line_endings(ESP_LINE_ENDINGS_CR);      // carriage return when ENTER
     esp_vfs_dev_uart_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);    // newline behavior
-    
-    
+
 
     std::cout << "Beginning Command Loop.\n"; 
     while (1) {

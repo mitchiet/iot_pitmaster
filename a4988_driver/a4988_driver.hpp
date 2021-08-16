@@ -10,109 +10,107 @@
 #define __A4988_DRIVER_HPP__
 
 #include <iostream>
+#include <thread>
 
 #include "driver/gpio.h"
-
-// GPIO for stepper driver
-constexpr gpio_num_t GPIO_NOT_EN = GPIO_NUM_18;
-constexpr gpio_num_t GPIO_MS1 = GPIO_NUM_5;
-constexpr gpio_num_t GPIO_MS2 = GPIO_NUM_17;
-constexpr gpio_num_t GPIO_MS3 = GPIO_NUM_16;
-constexpr gpio_num_t GPIO_NOT_RST = GPIO_NUM_4;
-constexpr gpio_num_t GPIO_NOT_SLP = GPIO_NUM_0;
-constexpr gpio_num_t GPIO_STEP = GPIO_NUM_2;
-constexpr gpio_num_t GPIO_DIR = GPIO_NUM_15;
-
-/// \todo get rid of static
-/// \todo make GPIO members
-/// \todo change name to stepper motor
-/// \todo this pointers
 
 class a4988_driver {
 
     private:
 
-        // thread that runs
-        static void* stepper_run(void* p);
-
         // ~enable signal
-        static int not_en;
+        gpio_num_t m_gpio_not_en;
         // ms1 signal
-        static int ms1;
+        gpio_num_t m_gpio_ms1;
         // ms2 signal
-        static int ms2;
+        gpio_num_t m_gpio_ms2;
         // ms3 signal
-        static int ms3;
+        gpio_num_t m_gpio_ms3;
         // ~reset signal
-        static int not_rst;
+        gpio_num_t m_gpio_not_rst;
         // ~sleep signal
-        static int not_slp;
+        gpio_num_t m_gpio_not_slp;
         // step signal, on and off pulses
-        static int step;
+        gpio_num_t m_gpio_step;
         // direction signal
-        static int dir;
+        gpio_num_t m_gpio_dir;
+
+        bool m_enabled {false};
 
 
     public:
-        inline a4988_driver() {
+
+        inline a4988_driver(const gpio_num_t not_en, const gpio_num_t ms1,
+        const gpio_num_t ms2, const gpio_num_t ms3,
+        const gpio_num_t not_rst, const gpio_num_t not_slp,
+        const gpio_num_t step, const gpio_num_t dir) {
+
+            this->m_gpio_not_en = not_en;
+            this->m_gpio_ms1 = ms1;
+            this->m_gpio_ms2 = ms2;
+            this->m_gpio_ms3 = ms3;
+            this->m_gpio_not_rst = not_rst;
+            this->m_gpio_not_slp = not_slp;
+            this->m_gpio_step = step;
+            this->m_gpio_dir = dir;
+
         }
 
-        // thread launcher
-        static bool launch_a4988_driver_thread();
+        // main pwm logic function
+        void a4988_run();
+
+        // thread function
+        std::thread a4988_run_thread();
 
         // sets ~enable
-        inline static void set_not_en(int level) {
-            not_en = level;
-            gpio_set_level(GPIO_NOT_EN, not_en);
+        inline void set_not_en(int level) {
+            gpio_set_level(this->m_gpio_not_en, level);
             std::cout << "Set ~Enable signal to " << level << "\n";
+            if (level == 0)
+                m_enabled = true;
+            else
+                m_enabled = false;
         }
 
         // sets ms1
-        inline static void set_ms1(int level) {
-            ms1 = level;
-            gpio_set_level(GPIO_MS1, ms1);
+        inline void set_ms1(int level) {
+            gpio_set_level(this->m_gpio_ms1, level);
             std::cout << "Set MS1 signal to " << level << "\n";
         }
 
         // sets ms2
-        inline static void set_ms2(int level) {
-            ms2 = level;
-            gpio_set_level(GPIO_MS2, ms2);
+        inline void set_ms2(int level) {
+            gpio_set_level(this->m_gpio_ms2, level);
             std::cout << "Set MS2 signal to " << level << "\n";
         }
 
         // sets ms3
-        inline static void set_ms3(int level) {
-            ms3 = level;
-            gpio_set_level(GPIO_MS3, ms3);
+        inline void set_ms3(int level) {
+            gpio_set_level(this->m_gpio_ms3, level);
             std::cout << "Set MS3 signal to " << level << "\n";
         }
 
         // sets ~reset
-        inline static void set_not_rst(int level) {
-            not_rst = level;
-            gpio_set_level(GPIO_NOT_RST, not_rst);
+        inline void set_not_rst(int level) {
+            gpio_set_level(this->m_gpio_not_rst, level);
             std::cout << "Set ~Reset signal to " << level << "\n";
         }
 
         // sets ~sleep
-        inline static void set_not_slp(int level) {
-            not_slp = level;
-            gpio_set_level(GPIO_NOT_SLP, not_slp);
+        inline void set_not_slp(int level) {
+            gpio_set_level(this->m_gpio_not_slp, level);
             std::cout << "Set ~Sleep to " << level << "\n";
         }
 
         // sets step (pulse)
-        inline static void set_step(const int level) {
-            step = level;
-            gpio_set_level(GPIO_STEP, step);
+        inline void set_step(const int level) {
+            gpio_set_level(this->m_gpio_step, level);
             //std::cout << "Set step to " << level << "\n"; // called too often
         }
 
         // sets direction (1 is clockwise, 0 is counterclockwise)
-        inline static void set_dir(int level) {
-            dir = level;
-            gpio_set_level(GPIO_DIR, dir);
+        inline void set_dir(int level) {
+            gpio_set_level(this->m_gpio_dir, level);
             std::cout << "Set Direction signal to " << level << "\n";
             if (level == 1)
                 std::cout << "Direction set to Clockwise\n";

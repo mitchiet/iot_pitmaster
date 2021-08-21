@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # Adds the bluetooth module
-set(EXTRA_COMPONENT_DIRS "./bluetooth/" "./pwm/" "./a4988_driver/")
+set(EXTRA_COMPONENT_DIRS "./a4988_driver/" "./bluetooth/" "./pwm/" "./test/")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(iot_pitmaster)

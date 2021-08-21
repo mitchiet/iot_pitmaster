@@ -17,45 +17,63 @@
 // a4988 run function
 void a4988_driver::a4988_run() {
 
+    ///\todo error messages
+
     // ~enable
-    gpio_reset_pin(this->m_gpio_not_en);
-    gpio_set_direction(this->m_gpio_not_en, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_not_en, 1); // default
+    if (this->m_gpio_not_en != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_not_en);
+        gpio_set_direction(this->m_gpio_not_en, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_not_en, 1); // default
+    }
 
     // ms1
-    gpio_reset_pin(this->m_gpio_ms1);
-    gpio_set_direction(this->m_gpio_ms1, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_ms1, 0); // default
+    if (this->m_gpio_ms1 != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_ms1);
+        gpio_set_direction(this->m_gpio_ms1, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_ms1, 0); // default
+    }
 
     // ms2
-    gpio_reset_pin(this->m_gpio_ms2);
-    gpio_set_direction(this->m_gpio_ms2, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_ms2, 0); // default
+    if (this->m_gpio_ms2 != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_ms2);
+        gpio_set_direction(this->m_gpio_ms2, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_ms2, 0); // default
+    }
 
     // ms3
-    gpio_reset_pin(this->m_gpio_ms3);
-    gpio_set_direction(this->m_gpio_ms3, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_ms3, 0); // default
+    if (this->m_gpio_ms3 != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_ms3);
+        gpio_set_direction(this->m_gpio_ms3, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_ms3, 0); // default
+    }
 
     // ~reset
-    gpio_reset_pin(this->m_gpio_not_rst);
-    gpio_set_direction(this->m_gpio_not_rst, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_not_rst, 1); // default
+    if (this->m_gpio_not_rst != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_not_rst);
+        gpio_set_direction(this->m_gpio_not_rst, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_not_rst, 1); // default
+    }
 
     // ~sleep
-    gpio_reset_pin(this->m_gpio_not_slp);
-    gpio_set_direction(this->m_gpio_not_slp, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_not_slp, 1); // default
+    if (this->m_gpio_not_slp != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_not_slp);
+        gpio_set_direction(this->m_gpio_not_slp, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_not_slp, 1); // default
+    }
 
     // step
-    gpio_reset_pin(this->m_gpio_step);
-    gpio_set_direction(this->m_gpio_step, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_step, 0); // default
+    if (this->m_gpio_step != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_step);
+        gpio_set_direction(this->m_gpio_step, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_step, 0); // default
+    }
 
     // dir
-    gpio_reset_pin(this->m_gpio_dir);
-    gpio_set_direction(this->m_gpio_dir, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio_dir, 0); // default
+    if (this->m_gpio_dir != GPIO_NUM_NC) {
+        gpio_reset_pin(this->m_gpio_dir);
+        gpio_set_direction(this->m_gpio_dir, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio_dir, 0); // default
+    }
 
     while (1) {
         if (this->m_enabled) {

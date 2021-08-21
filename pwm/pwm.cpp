@@ -15,23 +15,28 @@
 #include "freertos/task.h"
 
 void pwm::pwm_run() {
-    // pwm GPIO setup
-    gpio_reset_pin(this->m_gpio);
-    gpio_set_direction(this->m_gpio, GPIO_MODE_OUTPUT);
-    gpio_set_level(this->m_gpio, 0);
+    if (this->m_gpio != GPIO_NUM_NC) {
+        // pwm GPIO setup
+        gpio_reset_pin(this->m_gpio);
+        gpio_set_direction(this->m_gpio, GPIO_MODE_OUTPUT);
+        gpio_set_level(this->m_gpio, 0);
 
-    while (1) {
-        // on part of cycle
-        if (this->m_duty_cycle > 0) {
-            gpio_set_level(this->m_gpio, 1);
-            vTaskDelay(this->m_duty_cycle / portTICK_PERIOD_MS);
-        }
+        while (1) {
+            // on part of cycle
+            if (this->m_duty_cycle > 0) {
+                gpio_set_level(this->m_gpio, 1);
+                vTaskDelay(this->m_duty_cycle / portTICK_PERIOD_MS);
+            }
 
-        // off part of cycle
-        if (this->m_duty_cycle < 100) {
-            gpio_set_level(this->m_gpio, 0);
-            vTaskDelay((100 - this->m_duty_cycle) / portTICK_PERIOD_MS);
+            // off part of cycle
+            if (this->m_duty_cycle < 100) {
+                gpio_set_level(this->m_gpio, 0);
+                vTaskDelay((100 - this->m_duty_cycle) / portTICK_PERIOD_MS);
+            }
         }
+    }
+    else {
+        std::cout << "Error: This signal is not assigned to a valid GPIO.\n";
     }
 }
 

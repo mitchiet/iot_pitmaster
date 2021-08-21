@@ -9,10 +9,23 @@
 #ifndef __A4988_DRIVER_HPP__
 #define __A4988_DRIVER_HPP__
 
+#include <atomic>
 #include <iostream>
 #include <thread>
 
 #include "driver/gpio.h"
+
+inline bool is_valid_signal(const gpio_num_t gpio, const int level) {
+    if (gpio == GPIO_NUM_NC) {
+        std::cout << "Error: This signal is not assigned to a valid GPIO.\n";
+        return false;
+    }
+    if (!(level == 1 || level == 0)) {
+        std::cout << "Error: This signal can only be set to 1 or 0.\n";
+        return false;
+    }
+    return true;
+}
 
 class a4988_driver {
 
@@ -35,7 +48,8 @@ class a4988_driver {
         // direction signal
         gpio_num_t m_gpio_dir;
 
-        bool m_enabled {false};
+        // atomic bool so it is thread safe
+        std::atomic<bool> m_enabled {false};
 
 
     public:
@@ -64,58 +78,74 @@ class a4988_driver {
 
         // sets ~enable
         inline void set_not_en(int level) {
-            gpio_set_level(this->m_gpio_not_en, level);
-            std::cout << "Set ~Enable signal to " << level << "\n";
-            if (level == 0)
-                m_enabled = true;
-            else
-                m_enabled = false;
+            if (is_valid_signal(this->m_gpio_not_en, level)) {
+                gpio_set_level(this->m_gpio_not_en, level);
+                std::cout << "Set ~Enable signal to " << level << "\n";
+                if (level == 0)
+                    m_enabled = true;
+                else
+                    m_enabled = false;
+            }
         }
 
         // sets ms1
         inline void set_ms1(int level) {
-            gpio_set_level(this->m_gpio_ms1, level);
-            std::cout << "Set MS1 signal to " << level << "\n";
+            if (is_valid_signal(this->m_gpio_ms1, level)) {
+                gpio_set_level(this->m_gpio_ms1, level);
+                std::cout << "Set MS1 signal to " << level << "\n";
+            }
         }
 
         // sets ms2
         inline void set_ms2(int level) {
-            gpio_set_level(this->m_gpio_ms2, level);
-            std::cout << "Set MS2 signal to " << level << "\n";
+            if (is_valid_signal(this->m_gpio_ms2, level)) {
+                gpio_set_level(this->m_gpio_ms2, level);
+                std::cout << "Set MS2 signal to " << level << "\n";
+            }
         }
 
         // sets ms3
         inline void set_ms3(int level) {
-            gpio_set_level(this->m_gpio_ms3, level);
-            std::cout << "Set MS3 signal to " << level << "\n";
+            if (is_valid_signal(this->m_gpio_ms3, level)) {
+                gpio_set_level(this->m_gpio_ms3, level);
+                std::cout << "Set MS3 signal to " << level << "\n";
+            }
         }
 
         // sets ~reset
         inline void set_not_rst(int level) {
-            gpio_set_level(this->m_gpio_not_rst, level);
-            std::cout << "Set ~Reset signal to " << level << "\n";
+            if (is_valid_signal(this->m_gpio_not_rst, level)) {
+                gpio_set_level(this->m_gpio_not_rst, level);
+                std::cout << "Set ~Reset signal to " << level << "\n";
+            }
         }
 
         // sets ~sleep
         inline void set_not_slp(int level) {
-            gpio_set_level(this->m_gpio_not_slp, level);
-            std::cout << "Set ~Sleep to " << level << "\n";
+            if (is_valid_signal(this->m_gpio_not_slp, level)) {
+                gpio_set_level(this->m_gpio_not_slp, level);
+                std::cout << "Set ~Sleep to " << level << "\n";
+            }
         }
 
         // sets step (pulse)
         inline void set_step(const int level) {
-            gpio_set_level(this->m_gpio_step, level);
-            //std::cout << "Set step to " << level << "\n"; // called too often
+            if (is_valid_signal(this->m_gpio_step, level)) {
+                gpio_set_level(this->m_gpio_step, level);
+                //std::cout << "Set step to " << level << "\n"; // called too often
+            }
         }
 
         // sets direction (1 is clockwise, 0 is counterclockwise)
         inline void set_dir(int level) {
-            gpio_set_level(this->m_gpio_dir, level);
-            std::cout << "Set Direction signal to " << level << "\n";
-            if (level == 1)
-                std::cout << "Direction set to Clockwise\n";
-            else if(level == 0)
-                std::cout << "Direction set to Counterclockwise\n";
+            if (is_valid_signal(this->m_gpio_dir, level)) {
+                gpio_set_level(this->m_gpio_dir, level);
+                std::cout << "Set Direction signal to " << level << "\n";
+                if (level == 1)
+                    std::cout << "Direction set to Clockwise\n";
+                else if(level == 0)
+                    std::cout << "Direction set to Counterclockwise\n";
+            }
         }
 
 };

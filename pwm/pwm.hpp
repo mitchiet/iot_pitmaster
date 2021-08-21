@@ -9,6 +9,7 @@
 #ifndef __PWM_HPP__
 #define __PWM_HPP__
 
+#include <atomic>
 #include <iostream>
 #include <thread>
 
@@ -18,7 +19,7 @@ class pwm {
 
     private:
         // the duty cycle of the pwm (0-100)%
-        int m_duty_cycle;
+        std::atomic<int> m_duty_cycle {0};
         // the gpio pin being used
         gpio_num_t m_gpio;
 
@@ -29,8 +30,13 @@ class pwm {
         }
 
         inline void set_duty_cycle(const int duty_cycle) {
-            this->m_duty_cycle = duty_cycle;
-            std::cout << "Set pwm duty cycle to " << duty_cycle << "%\n";
+            if (duty_cycle >= 0 || duty_cycle <= 100) {
+                this->m_duty_cycle = duty_cycle;
+                std::cout << "Set pwm duty cycle to " << duty_cycle << "%\n";
+            }
+            else {
+                std::cout << "Duty cycle can only be set 0-100.\n";
+            }
         }
 
         // main pwm logic function
